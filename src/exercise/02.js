@@ -6,13 +6,18 @@ import * as React from 'react'
 function useLocalStorageState (
   key, 
   defaultValue = '', 
-  {serialize = JSON.stringify,deserialize = JSON.parse} = {},) {
+  {serialize = JSON.stringify,deserialize = JSON.parse} = {},
+  ) {
  
   const [state, setState] = React.useState(
     () => {
       const valueInLocalStorage = window.localStorage.getItem(key)
       if (valueInLocalStorage) {
-        return deserialize(valueInLocalStorage)
+        try {
+          return deserialize(valueInLocalStorage)
+        } catch(error) {
+          window.localStorage.removeItem(key)
+        } 
       }
       //To return a function if defaultValue it's a function
       return typeof defaultValue === 'function' ? defaultValue() : defaultValue
@@ -23,7 +28,8 @@ function useLocalStorageState (
   React.useEffect(() => {
     const prevKey = prevKeyRef.current
     if(prevKey !== key) {
-      window.localStorage.removeItem(prevKey)}
+      window.localStorage.removeItem(prevKey)
+    }
     prevKeyRef.current = key  
     window.localStorage.setItem(key, serialize(state) )
   }, [key, state, serialize])
