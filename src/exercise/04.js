@@ -5,12 +5,17 @@ import * as React from 'react'
 
 function Board() {
   // 🐨 squares is the state for this component. Add useState for squares
-  const squares = Array(9).fill(null)
+  const init_squares = Array(9).fill(null)
+  const [squares, setSquares] = React.useState(init_squares)
 
   // 🐨 We'll need the following bits of derived state:
   // - nextValue ('X' or 'O')
   // - winner ('X', 'O', or null)
   // - status (`Winner: ${winner}`, `Scratch: Cat's game`, or `Next player: ${nextValue}`)
+  const nextValue = calculateNextValue(squares)
+  const winner = calculateWinner(squares)
+  const status = calculateStatus(winner, squares, nextValue)
+  
   // 💰 I've written the calculations for you! So you can use my utilities
   // below to create these variables
 
@@ -21,12 +26,19 @@ function Board() {
     // given square index (like someone clicked a square that's already been
     // clicked), then return early so we don't make any state changes
     //
+    if( winner || squares[square]) {
+      return
+    }
+
     // 🦉 It's typically a bad idea to mutate or directly change state in React.
     // Doing so can lead to subtle bugs that can easily slip into production.
     //
     // 🐨 make a copy of the squares array
     // 💰 `[...squares]` will do it!)
     //
+    const squaresCopy = [...squares];
+    squaresCopy[square] = nextValue;
+    setSquares(squaresCopy)
     // 🐨 set the value of the square that was selected
     // 💰 `squaresCopy[square] = nextValue`
     //
@@ -36,6 +48,7 @@ function Board() {
   function restart() {
     // 🐨 reset the squares
     // 💰 `Array(9).fill(null)` will do it!
+    setSquares(init_squares)
   }
 
   function renderSquare(i) {
@@ -49,7 +62,7 @@ function Board() {
   return (
     <div>
       {/* 🐨 put the status in the div below */}
-      <div className="status">STATUS</div>
+      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
