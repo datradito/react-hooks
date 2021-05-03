@@ -22,6 +22,12 @@ function PokemonInfo({pokemonName}) {
     setPokemon(null)  
     fetchPokemon(pokemonName).then(res => {
       setPokemon(res)
+    }).catch(error => {
+      return (
+        <div role="alert">
+          There was an error: <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+      </div> 
+      )
     })
   }, [pokemonName])
   if(!pokemonName) {
