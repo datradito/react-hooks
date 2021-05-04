@@ -11,6 +11,7 @@ import {PokemonForm, fetchPokemon,  PokemonInfoFallback, PokemonDataView} from '
 function PokemonInfo({pokemonName}) {
   const [pokemon, setPokemon] = React.useState(null)
   const [error,  setError] = React.useState(null)
+  const [status, setStatus] = React.useState('idle')
 
   React.useEffect(() => {
     if(!pokemonName) {
@@ -18,12 +19,15 @@ function PokemonInfo({pokemonName}) {
     }
     setPokemon(null)  
     fetchPokemon(pokemonName).then(
+      setStatus('pending'),
       res => setPokemon(res),
+      setStatus('resolved'),
       error => setError(error)
     )
   }, [pokemonName, setError])
 
   if (error) {
+    setStatus('rejected')
     return (
       <div role="alert">
         There was an error: <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
@@ -53,6 +57,7 @@ function PokemonInfo({pokemonName}) {
 
 function App() {
   const [pokemonName, setPokemonName] = React.useState('')
+
 
   function handleSubmit(newPokemonName) {
     setPokemonName(newPokemonName)
