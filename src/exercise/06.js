@@ -3,44 +3,8 @@
 
 import * as React from 'react'
 import {PokemonForm, fetchPokemon,  PokemonInfoFallback, PokemonDataView} from '../pokemon'
+import {ErrorBoundary} from 'react-error-boundary'
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error:null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  // componentDidCatch(error, errorInfo) {
-  //   // You can also log the error to an error reporting service
-  //   logErrorToMyService(error, errorInfo);
-  // }
-
-  render() {
-    if (this.state.hasError) {
-      return  <this.props.FallbackComponent error={this.state.error} />    
-    }
-    return this.props.children; 
-  }
-}
-
-// class ErrorBoundary extends React.Component {
-//   state = {error: null}
-//   static getDerivedStateFromError(error) {
-//     return {error}
-//   }
-//   render() {
-//     const {error} = this.state
-//     if (error) {
-//       return <this.props.FallbackComponent error={error} />
-//     }
-
-//     return this.props.children
-//   }
-// }
 
 function PokemonInfo({pokemonName}) {
   const [state, setState] = React.useState({
@@ -86,11 +50,12 @@ function PokemonInfo({pokemonName}) {
   throw new Error('This is impossible!')
 }
 
-function ErrorFallback({error}) {
+function ErrorFallback({error, resetErrorBoundary}) {
   return (
     <div role="alert">
       There was an error:{' '}
       <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
     </div>
   )
 }
@@ -108,7 +73,9 @@ function App() {
       <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit} />
       <hr />
       <div className="pokemon-info">
-        <ErrorBoundary FallbackComponent={ErrorFallback} key={pokemonName}>
+        <ErrorBoundary FallbackComponent={ErrorFallback}  onReset={() => {
+          setPokemonName('')
+        }}>
           <PokemonInfo pokemonName={pokemonName} /> 
         </ErrorBoundary>
       </div>
